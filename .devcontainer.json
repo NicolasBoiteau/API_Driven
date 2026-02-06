@@ -1,0 +1,11 @@
+{
+    "name": "API Driven Environment",
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "forwardPorts": [4566],
+    "portsAttributes": {
+        "4566": {
+            "label": "LocalStack API",
+            "visibility": "public"
+        }
+    }
+}

@@ -51,3 +51,20 @@ clean:
 	rm -rf rep_localstack
 	rm -f lambda/function.zip
 	@echo "✨ Environnement nettoyé."
+
+
+# --- Raccourcis pour piloter l'EC2 via l'API ---
+
+# Récupère dynamiquement l'ID de l'API et de l'instance pour lancer la commande START
+ec2-start:
+	@echo "🟢 Envoi de l'ordre START via l'API..."
+	$(eval API_ID := $(shell aws --endpoint-url=http://127.0.0.1:4566 apigateway get-rest-apis --query 'items[0].id' --output text))
+	$(eval INST_ID := $(shell aws --endpoint-url=http://127.0.0.1:4566 ec2 describe-instances --query 'Reservations[0].Instances[0].InstanceId' --output text))
+	@curl -s -X POST "http://127.0.0.1:4566/restapis/$(API_ID)/prod/_user_request_/ec2?instance_id=$(INST_ID)&action=start" | jq .
+
+# Récupère dynamiquement l'ID de l'API et de l'instance pour lancer la commande STOP
+ec2-stop:
+	@echo "🔴 Envoi de l'ordre STOP via l'API..."
+	$(eval API_ID := $(shell aws --endpoint-url=http://127.0.0.1:4566 apigateway get-rest-apis --query 'items[0].id' --output text))
+	$(eval INST_ID := $(shell aws --endpoint-url=http://127.0.0.1:4566 ec2 describe-instances --query 'Reservations[0].Instances[0].InstanceId' --output text))
+	@curl -s -X POST "http://127.0.0.1:4566/restapis/$(API_ID)/prod/_user_request_/ec2?instance_id=$(INST_ID)&action=stop" | jq .

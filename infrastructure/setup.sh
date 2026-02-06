@@ -75,6 +75,9 @@ rm -f function.zip
 zip function.zip lambda_function.py > /dev/null
 
 # 4. Deploiement Lambda (Avec le fix IP)
+DOCKER_GATEWAY=$(docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}')
+echo " -> IP Gateway Docker détectée : $DOCKER_GATEWAY"
+
 echo "[4/5] Deploiement de la Lambda..."
 LAMBDA_ARN=$(awslocal lambda create-function \
     --function-name ManageEC2 \
@@ -82,7 +85,7 @@ LAMBDA_ARN=$(awslocal lambda create-function \
     --handler lambda_function.lambda_handler \
     --runtime python3.9 \
     --role arn:aws:iam::000000000000:role/lambda-ec2-role \
-    --environment Variables="{INSTANCE_ID=$INSTANCE_ID,AWS_ENDPOINT_URL=http://172.17.0.1:4566}" \
+    --environment Variables="{INSTANCE_ID=$INSTANCE_ID,AWS_ENDPOINT_URL=http://$DOCKER_GATEWAY:4566}" \
     --query 'FunctionArn' --output text)
 
 # 5. API Gateway (Start, Stop, Status)

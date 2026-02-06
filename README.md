@@ -162,5 +162,4 @@ make clean
 ```
 
 ---
-
-✨ **API first. Serverless by design. Infrastructure under control.**
+Nicolas Boiteau

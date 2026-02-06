@@ -1,83 +1,130 @@
-------------------------------------------------------------------------------------------------------
-ATELIER API-DRIVEN INFRASTRUCTURE
-------------------------------------------------------------------------------------------------------
-L’idée en 30 secondes : **Orchestration de services AWS via API Gateway et Lambda dans un environnement émulé**.  
-Cet atelier propose de concevoir une architecture **API-driven** dans laquelle une requête HTTP déclenche, via **API Gateway** et une **fonction Lambda**, des actions d’infrastructure sur des **instances EC2**, le tout dans un **environnement AWS simulé avec LocalStack** et exécuté dans **GitHub Codespaces**. L’objectif est de comprendre comment des services cloud serverless peuvent piloter dynamiquement des ressources d’infrastructure, indépendamment de toute console graphique.Cet atelier propose de concevoir une architecture API-driven dans laquelle une requête HTTP déclenche, via API Gateway et une fonction Lambda, des actions d’infrastructure sur des instances EC2, le tout dans un environnement AWS simulé avec LocalStack et exécuté dans GitHub Codespaces. L’objectif est de comprendre comment des services cloud serverless peuvent piloter dynamiquement des ressources d’infrastructure, indépendamment de toute console graphique.
-  
--------------------------------------------------------------------------------------------------------
-Séquence 1 : Codespace de Github
--------------------------------------------------------------------------------------------------------
-Objectif : Création d'un Codespace Github  
-Difficulté : Très facile (~5 minutes)
--------------------------------------------------------------------------------------------------------
-RDV sur Codespace de Github : <a href="https://github.com/features/codespaces" target="_blank">Codespace</a> **(click droit ouvrir dans un nouvel onglet)** puis créer un nouveau Codespace qui sera connecté à votre Repository API-Driven.
-  
----------------------------------------------------
-Séquence 2 : Création de l'environnement AWS (LocalStack)
----------------------------------------------------
-Objectif : Créer l'environnement AWS simulé avec LocalStack  
-Difficulté : Simple (~5 minutes)
----------------------------------------------------
+# 🧪 Ateliers DevOps — Infrastructure as Code & Automation
 
-Dans le terminal du Codespace copier/coller les codes ci-dessous etape par étape :  
+![DevOps](https://img.shields.io/badge/DevOps-IaC-blueviolet?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Production--Ready-success?style=for-the-badge)
 
-**Installation de l'émulateur LocalStack**  
-```
-sudo -i mkdir rep_localstack
-```
-```
-sudo -i python3 -m venv ./rep_localstack
-```
-```
-sudo -i pip install --upgrade pip && python3 -m pip install localstack && export S3_SKIP_SIGNATURE_VALIDATION=0
-```
-```
-localstack start -d
-```
-**vérification des services disponibles**  
-```
-localstack status services
-```
-**Réccupération de l'API AWS Localstack** 
-Votre environnement AWS (LocalStack) est prêt. Pour obtenir votre AWS_ENDPOINT cliquez sur l'onglet **[PORTS]** dans votre Codespace et rendez public votre port **4566** (Visibilité du port).
-Réccupérer l'URL de ce port dans votre navigateur qui sera votre ENDPOINT AWS (c'est à dire votre environnement AWS).
-Conservez bien cette URL car vous en aurez besoin par la suite.  
+Ce dépôt regroupe **deux ateliers DevOps complémentaires**, orientés *Infrastructure as Code*, automatisation et environnements reproductibles via **GitHub Codespaces**.
 
-Pour information : IL n'y a rien dans votre navigateur et c'est normal car il s'agit d'une API AWS (Pas un développement Web type UX).
+---
 
----------------------------------------------------
-Séquence 3 : Exercice
----------------------------------------------------
-Objectif : Piloter une instance EC2 via API Gateway
-Difficulté : Moyen/Difficile (~2h)
----------------------------------------------------  
-Votre mission (si vous l'acceptez) : Concevoir une architecture **API-driven** dans laquelle une requête HTTP déclenche, via **API Gateway** et une **fonction Lambda**, lancera ou stopera une **instance EC2** déposée dans **environnement AWS simulé avec LocalStack** et qui sera exécuté dans **GitHub Codespaces**. [Option] Remplacez l'instance EC2 par l'arrêt ou le lancement d'un Docker.  
+# 🐳 Atelier 1 — From Image to Cluster
 
-**Architecture cible :** Ci-dessous, l'architecture cible souhaitée.   
-  
-![Screenshot Actions](API_Driven.png)   
-  
----------------------------------------------------  
-## Processus de travail (résumé)
+![Packer](https://img.shields.io/badge/Packer-Build-blue?logo=packer)
+![Kubernetes](https://img.shields.io/badge/K3d-Cluster-326ce5?logo=kubernetes)
+![Ansible](https://img.shields.io/badge/Ansible-Deploy-EE0000?logo=ansible)
 
-1. Installation de l'environnement Localstack (Séquence 2)
-2. Création de l'instance EC2
-3. Création des API (+ fonction Lambda)
-4. Ouverture des ports et vérification du fonctionnement
+## 🎯 Objectif
 
----------------------------------------------------
-Séquence 4 : Documentation  
-Difficulté : Facile (~30 minutes)
----------------------------------------------------
-**Complétez et documentez ce fichier README.md** pour nous expliquer comment utiliser votre solution.  
-Faites preuve de pédagogie et soyez clair dans vos expliquations et processus de travail.  
-   
----------------------------------------------------
-Evaluation
----------------------------------------------------
-Cet atelier, **noté sur 20 points**, est évalué sur la base du barème suivant :  
-- Repository exécutable sans erreur majeure (4 points)
-- Fonctionnement conforme au scénario annoncé (4 points)
-- Degré d'automatisation du projet (utilisation de Makefile ? script ? ...) (4 points)
-- Qualité du Readme (lisibilité, erreur, ...) (4 points)
-- Processus travail (quantité de commits, cohérence globale, interventions externes, ...) (4 points) 
+Industrialiser le cycle de vie complet d’une application **Nginx**, depuis la construction d’une image immuable jusqu’à son déploiement automatisé sur un cluster Kubernetes local.
+
+---
+
+## 🏗️ Architecture & workflow
+
+```mermaid
+graph LR
+    A[Code source index.html] -->|Packer| B[Image Docker mon-nginx-custom:v1]
+    B -->|Import| C[Cluster K3d 1 Server + 2 Agents]
+    D[Ansible deploy.yml] -->|Orchestration| C
+    C -->|Service NodePort| E[Navigateur Web]
+```
+
+---
+
+## 🚀 Déploiement automatisé
+
+```bash
+make all
+```
+
+**Pipeline exécuté :**
+
+* Installation des dépendances
+* Création du cluster K3d
+* Build de l’image avec Packer
+* Déploiement Kubernetes via Ansible
+
+---
+
+## 🌐 Accès à l’application
+
+```bash
+kubectl port-forward svc/nginx-service 8081:80
+```
+
+➡️ Ouvrir le navigateur → **MISSION RÉUSSIE**
+
+---
+
+## 📂 Structure — Atelier 1
+
+```plaintext
+.
+├── Makefile
+├── deploy.yml
+├── index.html
+└── template.pkr.hcl
+```
+
+---
+
+# ☁️ Atelier 2 — API-Driven Infrastructure
+
+![AWS](https://img.shields.io/badge/AWS-LocalStack-orange?logo=amazon-aws)
+![Lambda](https://img.shields.io/badge/Compute-Lambda-blue?logo=aws-lambda)
+![Python](https://img.shields.io/badge/Code-Python_3.9-yellow?logo=python)
+![Docker](https://img.shields.io/badge/Env-Docker-blue?logo=docker)
+
+## 🎯 Objectif
+
+Piloter dynamiquement des ressources **EC2 simulées** via une **API REST Serverless**, sans aucune interaction manuelle avec une console AWS.
+
+L’environnement AWS est entièrement simulé localement grâce à **LocalStack**.
+
+---
+
+## 🏗️ Architecture technique
+
+```mermaid
+graph LR
+    U[Client curl] -->|POST /ec2| A[API Gateway]
+    A -->|Trigger| L[Lambda Python]
+    L -->|Boto3| LS[LocalStack]
+    LS -->|Start / Stop| E[EC2 Instance]
+```
+
+---
+
+## 🚀 Installation & déploiement
+
+### Démarrage de l’environnement
+
+```bash
+make all
+```
+
+* Installation des outils (awscli, localstack, jq)
+* Démarrage du conteneur LocalStack
+* Configuration AWS factice
+
+### Déploiement de la stack
+
+```bash
+make deploy
+```
+
+➡️ L’URL de l’API est affichée automatiquement
+
+---
+
+## 🎮 Utilisation de l’API
+
+### Stop de l’instance
+
+```bash
+curl -X POST http://127.0.0.1:4566/restapis/<API_ID>/prod/_user_request_/ec2 \
+  -H 'Content-Type: application/json' \
+  -d '{"instance_id": "<INSTANCE_ID>", "action": "stop"}'
+```
+
+### Start de l’i
